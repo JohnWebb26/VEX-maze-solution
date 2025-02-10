@@ -1,1 +1,34 @@
-{"mode":"Text","hardwareTarget":"brain","textContent":"#region VEXcode Generated Robot Configuration\nimport math\nimport random\nfrom vexcode_vr import *\n\n# Brain should be defined by default\nbrain=Brain()\n\ndrivetrain = Drivetrain(\"drivetrain\", 0)\npen = Pen(\"pen\", 8)\npen.set_pen_width(THIN)\nleft_bumper = Bumper(\"leftBumper\", 2)\nright_bumper = Bumper(\"rightBumper\", 3)\nfront_eye = EyeSensor(\"frontEye\", 4)\ndown_eye = EyeSensor(\"downEye\", 5)\nfront_distance = Distance(\"frontdistance\", 6)\ndistance = front_distance\nmagnet = Electromagnet(\"magnet\", 7)\nlocation = Location(\"location\", 9)\n\n#endregion VEXcode Generated Robot Configuration\nmyVariable = 0\n\ndef when_started1():\n    global myVariable\n    \n\n    drivetrain.turn_for(RIGHT, 90, DEGREES)\n    \n    while True:\n\n    \n\n        if front_distance.found_object() and front_distance.get_distance(MM) > 250:\n            drivetrain.drive_for(FORWARD, 250, MM)\n            drivetrain.turn_for(RIGHT, 90, DEGREES)\n\n        else:\n            drivetrain.turn_for(LEFT, 90, DEGREES)\n    \n\nvr_thread(when_started1)","textLanguage":"python","robotConfig":[],"slot":0,"platform":"PG","sdkVersion":"20240802.15.00.00","appVersion":"4.0.8","minVersion":"3.0.0","fileFormat":"2.0.0","targetBrainGen":"First","v5SoundsEnabled":false,"playground":"DynamicWallMaze","robotModel":"vr"}
+myVariable = 0
+moves_stack = []
+
+def when_started1():
+    global myVariable
+    pen.move(DOWN)
+    drivetrain.set_drive_velocity(100, PERCENT)
+    drivetrain.set_turn_velocity(100, PERCENT)
+
+    while not down_eye.detect(RED): 
+        if front_distance.get_distance(MM) > 260:
+            drivetrain.drive_for(FORWARD, 250, MM)
+            moves_stack.append(("FORWARD", 250, MM)) 
+            drivetrain.turn_for(RIGHT, 90, DEGREES)
+            moves_stack.append(("RIGHT", RIGHT, 90))
+        else:
+            drivetrain.turn_for(LEFT, 90, DEGREES)
+            moves_stack.append(("LEFT", LEFT, 90))
+        
+        if down_eye.detect(RED):
+            break
+
+
+    while moves_stack:
+        last_move = moves_stack.pop()
+        
+        if move_type == "FORWARD":
+            drivetrain.drive_for(REVERSE, 250, MM)
+        elif move_type == "RIGHT":
+            drivetrain.turn_for(LEFT, 90, DEGREES)
+        elif move_type == "LEFT":
+            drivetrain.turn_for(RIGHT, 90, DEGREES)
+
+vr_thread(when_started1)
