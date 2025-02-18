@@ -4,25 +4,26 @@ moves_stack = []
 def when_started1():
     global myVariable
     pen.move(DOWN)
-    drivetrain.set_drive_velocity(100, PERCENT)
+    drivetrain.set_drive_velocity(100, PERCENT) #I have put both velocities at 100 percent so that it will complete the maze quicker.
     drivetrain.set_turn_velocity(100, PERCENT)
 
     while not down_eye.detect(RED): 
-        if front_distance.get_distance(MM) > 260:
+        if front_distance.get_distance(MM) > 260: #This allows me to detect if there is a wall near to the front of the robot, so it can decide if it should drive forward or not.
             drivetrain.drive_for(FORWARD, 250, MM)
-            moves_stack.append(("FORWARD", 250, MM)) 
+            moves_stack.append(("FORWARD")) #After each movement, I append it and type the inverse in my while loop for when I go to return to start.
             drivetrain.turn_for(RIGHT, 90, DEGREES)
-            moves_stack.append(("RIGHT", RIGHT, 90))
+            moves_stack.append(("RIGHT"))
         else:
             drivetrain.turn_for(LEFT, 90, DEGREES)
-            moves_stack.append(("LEFT", LEFT, 90))
+            moves_stack.append(("LEFT"))
         
-        if down_eye.detect(RED):
+        if down_eye.detect(RED): #This allows me to detect the finish line so that the code can break and the stack can be used for returning to start.
+            pen.move(UP)
             break
 
 
     while moves_stack:
-        last_move = moves_stack.pop()
+        move_type = moves_stack.pop() #The stack has the inverse command for the movement based on the name of the appended movement.
         
         if move_type == "FORWARD":
             drivetrain.drive_for(REVERSE, 250, MM)
